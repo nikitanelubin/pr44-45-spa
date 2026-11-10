@@ -20,7 +20,7 @@ node seed.js
 cd ..\client
 npm install
 npm run build
-osp project domashniy-hleb.local start
+node server\index.js
 ```
 
 Сайт: http://domashniy-hleb.local
