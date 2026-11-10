@@ -2,7 +2,9 @@ import axios from 'axios'
 import router from './router'
 import { useAuthStore } from './stores/auth'
 
-export const API_ORIGIN = 'http://localhost:3004'
+// Клиент и API открываются с одного адреса (домен Open Server), поэтому хватает пути /api.
+// При npm run dev такие запросы передаёт серверу Vite (см. vite.config.js)
+export const API_ORIGIN = ''
 
 export const api = axios.create({ baseURL: `${API_ORIGIN}/api` })
 
