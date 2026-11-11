@@ -2,31 +2,31 @@
 
 Сервис доставки продуктов питания: Express.js + MySQL на сервере, Vue 3 на клиенте. Вся логика приложения работает через API, ответы в формате JSON.
 
-## Запуск в Open Server Panel 6
+## Запуск
 
-Настройки проекта лежат в `.osp\project.ini`: домен `domashniy-hleb.local`, запуск `node server\index.js`.
-Сервер Express отдаёт и API, и собранный клиент (`client\dist`), Open Server передаёт ему все запросы к домену.
+База данных - MySQL из Open Server: в Open Server включить модуль MySQL и запустить сервер.
+Если нет файла `server\.env`, скопировать в него `server\.env.example` (MySQL на localhost, пользователь root без пароля).
 
-1. Скопировать папку проекта в `C:\OSPanel\home`
-2. Если нет файла `server\.env`, скопировать в него `server\.env.example`. В `DB_HOST` указано имя модуля MySQL (`MySQL-8.0`)
-3. Перезапустить Open Server, включить модули MySQL-8.0 и Nginx
-4. В консоли Open Server:
+Терминал 1, сервер:
 
 ```
-osp project domashniy-hleb.local
 cd server
 npm install
 node seed.js
-cd ..\client
-npm install
-npm run build
-node server\index.js
+node index.js
 ```
 
-Сайт: http://domashniy-hleb.local
+Терминал 2, клиент:
 
-Для разработки без Open Server: в папке `server` выполнить `node index.js`, в папке `client` — `npm run dev`
-(Vite передаёт запросы `/api` и `/uploads` серверу на порт 3004).
+```
+cd client
+npm install
+npm run dev
+```
+
+API: http://localhost:3004/api, сайт: адрес, который напечатает Vite (обычно http://localhost:5173).
+
+Запросы к API для Postman с описаниями: `ПР44-45.postman_collection.json` (Postman -> Import).
 
 ## API
 

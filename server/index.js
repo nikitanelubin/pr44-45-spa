@@ -1,6 +1,5 @@
+require('dotenv').config();
 const path = require('path');
-// .env ищем рядом с этим файлом: Open Server запускает сервер из корня проекта, а не из папки server
-require('dotenv').config({ path: path.join(__dirname, '.env') });
 const express = require('express');
 const cors = require('cors');
 const authRoutes = require('./routes/auth');
@@ -17,14 +16,6 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api', authRoutes);
 app.use('/api', dishRoutes);
 app.use('/api', cartRoutes);
-
-// Собранный клиент Vue (папка client/dist, команда npm run build).
-// На адреса вроде /shop отдаём index.html, а нужный экран дальше выбирает Vue Router
-const dist = path.join(__dirname, '..', 'client', 'dist');
-app.use(express.static(dist));
-app.get(/^\/(?!api\/|uploads\/)/, (req, res) => {
-  res.sendFile(path.join(dist, 'index.html'));
-});
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Маршрут не найден' });
