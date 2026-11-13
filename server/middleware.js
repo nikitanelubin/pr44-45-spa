@@ -1,6 +1,7 @@
 const pool = require('./db');
 
-// Проверка токена из заголовка Authorization: Bearer {token}
+// Проверка входа. При входе пользователь получает токен (он хранится в users.token),
+// сайт присылает его в каждом запросе: Authorization: Bearer {token}. Ищем, чей это токен
 const auth = async (req, res, next) => {
   const header = req.headers.authorization || '';
   if (!header.startsWith('Bearer ')) {
@@ -10,6 +11,7 @@ const auth = async (req, res, next) => {
   if (!users.length) {
     return res.status(401).json({ message: 'Требуется авторизация' });
   }
+  // дальше в маршруте известно, чья это корзина: req.user.id
   req.user = users[0];
   next();
 };

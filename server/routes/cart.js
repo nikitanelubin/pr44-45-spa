@@ -4,12 +4,15 @@ const pool = require('../db');
 const { auth } = require('../middleware');
 
 const router = express.Router();
+// корзина своя у каждого пользователя, поэтому без входа к ней доступа нет
 router.use(auth);
 
-// Больше двух порций одного блюда добавить нельзя: блюдо "заканчивается"
+// Больше двух порций одного блюда добавить нельзя: блюдо "заканчивается".
+// code: 'out_of_stock' - по нему сайт понимает, что надо показать окно «Блюдо закончилось»
 const MAX_PORTIONS = 2;
 const outOfStock = (res) => res.status(409).json({ message: 'Блюдо закончилось', code: 'out_of_stock' });
 
+// Содержимое корзины: JOIN добавляет к строкам корзины название, цену и картинку блюда
 const getCart = async (userId) => {
   const [items] = await pool.query(
     `SELECT d.id, d.name, d.price, d.image, c.quantity
@@ -19,6 +22,7 @@ const getCart = async (userId) => {
      ORDER BY d.name`,
     [userId]
   );
+  // reduce складывает цену * количество по всем строкам
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   return { items, total };
 };
@@ -27,6 +31,8 @@ router.get('/cart', async (req, res) => {
   res.json(await getCart(req.user.id));
 });
 
+// Добавить блюдо: если оно уже в корзине - +1 порция, если нет - новая строка с количеством 1.
+// После каждого изменения возвращаем всю корзину, чтобы сайт сразу показал актуальное состояние
 router.post('/cart', async (req, res) => {
   const { dish_id } = req.body;
   const [dishes] = await pool.query('SELECT id FROM dishes WHERE id = ?', [dish_id]);
@@ -43,6 +49,7 @@ router.post('/cart', async (req, res) => {
   res.status(201).json(await getCart(req.user.id));
 });
 
+// Кнопки + и −: сайт присылает новое количество. Меньше 1 нельзя (для этого есть удаление), больше 2 - закончилось
 router.patch('/cart/:dishId', async (req, res) => {
   const quantity = Number(req.body.quantity);
   if (!Number.isInteger(quantity) || quantity < 1) {
@@ -59,6 +66,7 @@ router.delete('/cart/:dishId', async (req, res) => {
   res.json(await getCart(req.user.id));
 });
 
+// Оформление заказа: сохраняем заказ с суммой и очищаем корзину. Пустую корзину заказать нельзя
 router.post('/orders', async (req, res) => {
   const { items, total } = await getCart(req.user.id);
   if (!items.length) return res.status(422).json({ message: 'Корзина пуста, заказывать нечего' });

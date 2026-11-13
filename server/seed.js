@@ -2,6 +2,8 @@
 require('dotenv').config();
 const mysql = require('mysql2/promise');
 
+// Таблицы: пользователи, блюда, акции, корзина и заказы. Корзина хранится в базе, а не в браузере:
+// одна строка cart_items = блюдо в корзине пользователя и его количество
 const schema = `
 CREATE TABLE users (
   id INT AUTO_INCREMENT PRIMARY KEY,

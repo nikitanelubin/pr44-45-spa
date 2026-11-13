@@ -9,10 +9,13 @@ const cartRoutes = require('./routes/cart');
 const app = express();
 const PORT = process.env.PORT || 3004;
 
+// сайт на Vue работает на другом порту (5174), без CORS браузер не дал бы ему обращаться к API
 app.use(cors());
 app.use(express.json());
+// картинки блюд отдаются как обычные файлы: путь /uploads/borsch.jpg из базы сразу открывается
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// все адреса API начинаются с /api; маршруты разложены по файлам: вход, блюда, корзина
 app.use('/api', authRoutes);
 app.use('/api', dishRoutes);
 app.use('/api', cartRoutes);

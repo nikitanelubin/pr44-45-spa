@@ -7,6 +7,7 @@ const { auth } = require('../middleware');
 
 const router = express.Router();
 
+// Ошибки собираем в объект { поле: текст }: сайт выводит каждую под своим полем и подсвечивает его красным
 router.post('/register', async (req, res) => {
   const { name, email, password } = req.body;
   const errors = {};
@@ -23,11 +24,13 @@ router.post('/register', async (req, res) => {
 
   if (Object.keys(errors).length) return res.status(422).json({ errors });
 
+  // в базе храним не пароль, а его хеш
   const hash = await bcrypt.hash(password, 10);
   await pool.query('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', [name.trim(), email, hash]);
   res.status(201).json({ message: 'Регистрация прошла успешно' });
 });
 
+// Вход: проверяем пароль и выдаём новый случайный токен, сайт сохранит его и будет отправлять с запросами
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   const errors = {};
@@ -44,6 +47,7 @@ router.post('/login', async (req, res) => {
   res.json({ token, user: { id: users[0].id, name: users[0].name } });
 });
 
+// Выход: стираем токен, после этого запросы с ним получат 401
 router.post('/logout', auth, async (req, res) => {
   await pool.query('UPDATE users SET token = NULL WHERE id = ?', [req.user.id]);
   res.json({ message: 'Вы вышли из аккаунта' });
