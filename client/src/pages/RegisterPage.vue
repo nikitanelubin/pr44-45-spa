@@ -1,7 +1,9 @@
 <template>
   <div class="card form-card">
     <h1>Регистрация</h1>
+    <!-- novalidate отключает встроенные проверки браузера: все ошибки приходят от API -->
     <form novalidate @submit.prevent="submit">
+      <!-- если в errors есть ошибка поля, поле получает класс invalid (красная рамка), а под ним текст ошибки -->
       <div class="field">
         <label>Имя</label>
         <input v-model="form.name" :class="{ invalid: errors.name }" />
@@ -17,7 +19,7 @@
         <input v-model="form.password" type="password" :class="{ invalid: errors.password }" />
         <span v-if="errors.password" class="error-text">{{ errors.password }}</span>
       </div>
-      <button class="btn btn-wide" :disabled="loading">Зарегистрироваться</button>
+      <button class="btn btn-wide">Зарегистрироваться</button>
     </form>
   </div>
 </template>
@@ -33,11 +35,11 @@ const toast = useToastStore()
 
 const form = reactive({ name: '', email: '', password: '' })
 const errors = ref({})
-const loading = ref(false)
 
+// Отправляем форму в API. Успех - сообщение и переход на вход.
+// 422 - API вернул { errors: { поле: текст } }, кладём их в errors, и шаблон показывает их под полями
 const submit = async () => {
   errors.value = {}
-  loading.value = true
   try {
     await api.post('/register', form)
     toast.show('Регистрация прошла успешно. Теперь войдите в систему')
@@ -48,8 +50,6 @@ const submit = async () => {
     } else {
       toast.show('Не удалось зарегистрироваться', 'error')
     }
-  } finally {
-    loading.value = false
   }
 }
 </script>

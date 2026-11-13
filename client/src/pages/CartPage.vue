@@ -22,6 +22,8 @@
     <p v-if="cart.items.length === 0" class="empty">В корзине пока ничего нет.</p>
     <p v-else class="total">Итого: {{ cart.total }} ₽</p>
 
+    <!-- Три окна корзины. Каждое видно, пока его переменная истинна:
+         showSoldOut - лимит порций, dishToRemove - какое блюдо удаляем, showOrder - подтверждение заказа -->
     <AppModal
       :show="showSoldOut"
       title="Блюдо закончилось"
@@ -57,6 +59,7 @@ import AppModal from '../components/AppModal.vue'
 import { useToastStore } from '../stores/toast'
 
 const toast = useToastStore()
+// корзина хранится в базе; API после каждого изменения присылает её целиком, и мы просто заменяем cart
 const cart = ref({ items: [], total: 0 })
 const showSoldOut = ref(false)
 const showOrder = ref(false)
@@ -71,6 +74,7 @@ const load = async () => {
   }
 }
 
+// + и − отправляют новое количество. Больше 2 порций API не даёт (out_of_stock) - показываем окно
 const setQuantity = async (item, quantity) => {
   try {
     const { data } = await api.patch(`/cart/${item.id}`, { quantity })
@@ -107,7 +111,8 @@ const removeItem = async () => {
   }
 }
 
-// Пустую корзину заказать нельзя, об этом сообщает сервер
+// «Заказать»: если в корзине что-то есть, спрашиваем подтверждение.
+// Пустую корзину заказать нельзя: отправляем запрос, и сообщение об этом приходит от API
 const askOrder = async () => {
   if (cart.value.items.length > 0) {
     showOrder.value = true

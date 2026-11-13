@@ -13,6 +13,7 @@
         <span v-if="errors.composition" class="error-text">{{ errors.composition }}</span>
       </div>
 
+      <!-- шесть числовых полей одинаковые, поэтому выводим их циклом по списку numberFields -->
       <div class="form-row">
         <div v-for="item in numberFields" :key="item.key" class="field">
           <label>{{ item.label }}</label>
@@ -46,7 +47,7 @@
       </div>
 
       <div class="head-buttons">
-        <button class="btn" :disabled="loading">Сохранить</button>
+        <button class="btn">Сохранить</button>
         <RouterLink to="/shop" class="btn btn-light">К списку блюд</RouterLink>
       </div>
     </form>
@@ -72,6 +73,7 @@ const route = useRoute()
 const router = useRouter()
 const toast = useToastStore()
 
+// одна страница для создания и редактирования: если в адресе есть id (/shop/3/edit), это редактирование
 const isEdit = computed(() => !!route.params.id)
 
 const numberFields = [
@@ -95,7 +97,6 @@ const form = reactive({
   cook_method: '',
 })
 const errors = ref({})
-const loading = ref(false)
 const showSaved = ref(false)
 
 const fileInput = ref(null)
@@ -103,6 +104,7 @@ const file = ref(null)
 const preview = ref('')
 const isOver = ref(false)
 
+// Файл приходит двумя путями: перетаскиванием (onDrop) или выбором через окно (onSelect). Дальше одинаково
 const setFile = (selected) => {
   if (!selected) return
   file.value = selected
@@ -121,12 +123,13 @@ const toShop = () => router.push('/shop')
 
 const save = async () => {
   errors.value = {}
-  loading.value = true
   // FormData нужна, чтобы отправить файл вместе с текстовыми полями
   const body = new FormData()
   Object.entries(form).forEach(([key, value]) => body.append(key, value))
   if (file.value) body.append('image', file.value)
 
+  // редактирование: PUT, сообщение и сразу в магазин; создание: POST и окно «Блюдо добавлено»,
+  // из него переход в магазин. Ошибки полей (422) выводятся под полями, как на регистрации
   try {
     if (isEdit.value) {
       await api.put(`/dishes/${route.params.id}`, body)
@@ -143,11 +146,10 @@ const save = async () => {
     } else {
       toast.show('Не удалось сохранить блюдо', 'error')
     }
-  } finally {
-    loading.value = false
   }
 }
 
+// при редактировании заполняем форму текущими данными блюда из API
 onMounted(async () => {
   if (!isEdit.value) return
   try {

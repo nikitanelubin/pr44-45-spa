@@ -13,7 +13,7 @@
         <span v-if="errors.password" class="error-text">{{ errors.password }}</span>
       </div>
       <p v-if="message" class="error-box">{{ message }}</p>
-      <button class="btn btn-wide" :disabled="loading">Войти</button>
+      <button class="btn btn-wide">Войти</button>
     </form>
   </div>
 </template>
@@ -32,12 +32,13 @@ const toast = useToastStore()
 const form = reactive({ email: '', password: '' })
 const errors = ref({})
 const message = ref('')
-const loading = ref(false)
 
+// Три исхода входа:
+// успех - сохраняем токен в auth (дальше его добавит api.js) и идём в «Меню дня»;
+// 422 - пустые поля, ошибки под полями; 401 - неверный email или пароль, общее сообщение
 const submit = async () => {
   errors.value = {}
   message.value = ''
-  loading.value = true
   try {
     const { data } = await api.post('/login', form)
     auth.save(data.token, data.user.name)
@@ -51,8 +52,6 @@ const submit = async () => {
     } else {
       message.value = 'Нет связи с сервером'
     }
-  } finally {
-    loading.value = false
   }
 }
 </script>

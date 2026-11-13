@@ -29,8 +29,10 @@ const toast = useToastStore()
 const query = ref('')
 const results = ref([])
 const error = ref('')
+// searched - был ли уже поиск: «Ничего не найдено» показываем только после него, а не сразу при открытии
 const searched = ref(false)
 
+// поиск выполняет API (LIKE по названию), страница только выводит названия и фото найденных блюд
 const search = async () => {
   error.value = ''
   try {

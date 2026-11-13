@@ -8,6 +8,8 @@ import DishFormPage from '../pages/DishFormPage.vue'
 import CartPage from '../pages/CartPage.vue'
 import SearchPage from '../pages/SearchPage.vue'
 
+// meta - метки страниц: requiresAuth - только после входа, guestOnly - только до входа.
+// Создание и редактирование блюда - одна страница: :id в адресе есть только при редактировании
 const routes = [
   { path: '/', redirect: '/menu' },
   { path: '/register', component: RegisterPage, meta: { guestOnly: true } },
@@ -25,6 +27,7 @@ const router = createRouter({
   routes,
 })
 
+// Проверка перед каждым переходом: без входа - на страницу входа, после входа страницы входа и регистрации не нужны
 router.beforeEach((to) => {
   const auth = useAuthStore()
   if (to.meta.requiresAuth && !auth.isAuthenticated) return '/login'

@@ -1,4 +1,7 @@
+<!-- Одно модальное окно для всех случаев: страница передаёт текст через props
+     и узнаёт о нажатой кнопке через события confirm и cancel -->
 <template>
+  <!-- @click.self - щелчок по затемнённому фону (не по самому окну) закрывает окно -->
   <Transition name="modal">
     <div v-if="show" class="modal-back" @click.self="$emit('cancel')">
       <div class="modal-box">

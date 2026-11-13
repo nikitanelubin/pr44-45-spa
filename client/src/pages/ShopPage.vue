@@ -8,6 +8,8 @@
       </div>
     </div>
 
+    <!-- Аккордеон: у каждого блюда видно только название; подробности открываются стрелкой.
+         Открыто одно блюдо - то, чей id лежит в openId -->
     <div v-for="dish in dishes" :key="dish.id" class="card accordion">
       <div class="accordion-head">
         <strong>{{ dish.name }}</strong>
@@ -68,10 +70,12 @@ const load = async () => {
   }
 }
 
+// стрелка: щелчок по открытому блюду закрывает его, по другому - открывает это блюдо
 const toggle = (id) => {
   openId.value = openId.value === id ? null : id
 }
 
+// Если в корзине уже 2 порции, API отвечает code: 'out_of_stock', и мы показываем окно «Блюдо закончилось»
 const addToCart = async (dish) => {
   try {
     await api.post('/cart', { dish_id: dish.id })
@@ -85,6 +89,7 @@ const addToCart = async (dish) => {
   }
 }
 
+// после удаления заново берём список из API, и блюдо пропадает со страницы
 const removeDish = async (dish) => {
   try {
     await api.delete(`/dishes/${dish.id}`)

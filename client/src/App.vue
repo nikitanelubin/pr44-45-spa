@@ -2,6 +2,7 @@
   <header class="header">
     <RouterLink to="/" class="logo">🥖 Домашний Хлеб</RouterLink>
 
+    <!-- ссылки зависят от входа: вошедшему - экраны сайта и выход, гостю - регистрация и вход -->
     <nav v-if="auth.isAuthenticated" class="nav">
       <RouterLink to="/menu">Меню дня</RouterLink>
       <RouterLink to="/shop">Магазин</RouterLink>
@@ -24,6 +25,7 @@
     </RouterView>
   </main>
 
+  <!-- всплывающие сообщения из stores/toast.js; TransitionGroup анимирует появление и исчезновение -->
   <TransitionGroup name="toast" tag="div" class="toasts">
     <div v-for="item in toast.items" :key="item.id" class="toast" :class="item.type">
       {{ item.text }}
@@ -41,6 +43,7 @@ const auth = useAuthStore()
 const toast = useToastStore()
 const router = useRouter()
 
+// выход: API стирает токен, сайт забывает его у себя и переходит на вход
 const logout = async () => {
   await api.post('/logout').catch(() => {})
   auth.clear()

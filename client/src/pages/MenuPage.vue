@@ -39,8 +39,10 @@ import { api, imageUrl } from '../api'
 import { useToastStore } from '../stores/toast'
 
 const toast = useToastStore()
+// пока ответа нет, три пустых списка: страница уже рисуется, а блоки заполнятся после ответа API
 const menu = ref({ promotions: [], recommended: [], novelties: [] })
 
+// при открытии страницы одним запросом получаем все три блока: акции, рекомендации, новинки
 onMounted(async () => {
   try {
     const { data } = await api.get('/menu')

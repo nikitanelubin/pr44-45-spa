@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia'
 
+// Кто вошёл: токен и имя. Общие для всех страниц, поэтому лежат в Pinia, а не в одной странице.
+// Копия в localStorage нужна, чтобы вход не терялся после перезагрузки страницы
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     token: localStorage.getItem('token') || null,
@@ -7,6 +9,7 @@ export const useAuthStore = defineStore('auth', {
   }),
 
   getters: {
+    // !! превращает значение в true/false: есть токен - пользователь вошёл
     isAuthenticated: (state) => !!state.token,
   },
 
